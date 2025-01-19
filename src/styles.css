@@ -1,0 +1,197 @@
+html, body {
+    margin: 0; 
+    padding: 0;
+    background: #1e1e1e;
+    color: #fff;
+    font-family: "Segoe UI", sans-serif;
+    user-select: none;
+  }
+  
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  /* Címsor (titlebar) */
+  .titlebar {
+    height: 30px;
+    background: #2C2C2C;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  
+  /* -webkit-app-region: drag => ablakhúzás. 
+     De a gombokon no-drag kell, hogy kattintható maradjon. */
+  .drag-region {
+    flex: 1;
+    -webkit-app-region: drag;
+  }
+  .window-controls {
+    display: flex;
+  }
+  .window-controls button {
+    width: 45px;
+    height: 30px;
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 14px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+  }
+  .btn-min:hover { background: #444; }
+  .btn-max:hover { background: #444; }
+  .btn-close:hover { background: #FF4B4B; }
+  
+  /* Fő elrendezés: sidebar + content */
+  .browser-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden; 
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 80px;
+    background: #2C2C2C;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px 0;
+    transition: width 0.3s ease;
+  }
+  .sidebar:hover {
+    width: 200px; /* Arc-szerű kiugrás */
+  }
+  .sidebar-top, .sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: #bbb;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .sidebar-item:hover {
+    background: #444;
+  }
+  .sidebar-item i {
+    margin-right: 10px;
+  }
+  .sidebar-item span {
+    display: none; /* ha keskeny, nem látszik */
+  }
+  .sidebar:hover .sidebar-item span {
+    display: inline; /* kibővült sávnál látszik a szöveg */
+  }
+  .logo i {
+    font-size: 20px;
+  }
+  
+  /* Tab lista */
+  .tab-list {
+    flex: 1;
+    width: 100%;
+    overflow-y: auto;
+  }
+  
+  /* A content-panel */
+  .content-panel {
+    flex: 1;
+    background: #1e1e1e;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Topbar (navigáció + URL bar) */
+  .topbar {
+    height: 50px;
+    background: #2C2C2C;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+  }
+  .nav-buttons button {
+    width: 40px;
+    height: 35px;
+    margin-right: 5px;
+    border: none;
+    background: #3B3B3B;
+    color: #ccc;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .nav-buttons button:hover {
+    background: #555;
+  }
+  .url-bar {
+    flex: 1;
+    height: 35px;
+    margin-left: 5px;
+    padding: 0 10px;
+    background: #3B3B3B;
+    border: none;
+    border-radius: 4px;
+    color: #ccc;
+    font-size: 14px;
+  }
+  
+  /* Webview konténer */
+  .webview-container {
+    position: relative;
+    flex: 1;
+  }
+  webview {
+    width: 100%;
+    height: 100%;
+    display: none; /* alapból rejtve, az aktív tabnál mutatjuk */
+  }
+  
+  /* Tabet megjelenítő kis elem a sidebar-ban */
+  .tab-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background: #3B3B3B;
+    margin: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #ddd;
+    justify-content: space-between;
+  }
+  .tab-item.active {
+    background: #555;
+  }
+  .tab-item span {
+    margin-right: 8px;
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+    max-width: 100px; /* oldalsáv keskeny módhoz */
+  }
+  .tab-close-btn {
+    color: #aaa;
+    cursor: pointer;
+  }
+  .tab-close-btn:hover {
+    color: #fff;
+  }
+  
+  /* Minimális animáció induláskor: */
+  @keyframes fadeIn {
+    from { opacity: 0.5; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .main-container {
+    animation: fadeIn 0.4s ease-out;
+  }
+  
