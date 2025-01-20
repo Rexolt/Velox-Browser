@@ -2,11 +2,11 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8" />
-  <title>Velox Minimal Rounded</title>
+  <title>Velox Browser</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link 
-    href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" 
     rel="stylesheet"
   />
   <link 
@@ -15,9 +15,9 @@
   />
 
   <style>
-   
+    
     * {
-      margin: 0;
+      margin: 0; 
       padding: 0;
       box-sizing: border-box;
       user-select: none;
@@ -29,197 +29,172 @@
       background: transparent;
       overflow: hidden;
     }
-
-   
     .app-container {
       width: 100%;
       height: 100%;
-      border-radius: 10px; 
-      background: rgba(30,30,30,0.94);
-      overflow: hidden;
+      background: rgba(30,30,30,0.95);
+      border-radius: 12px;
       display: flex;
       flex-direction: column;
-      animation: fadeZoom 0.5s ease forwards;
+      position: relative;
+      animation: fadeIn 0.4s ease forwards;
     }
-
-    
-    @keyframes fadeZoom {
-      0%   { opacity: 0.5; transform: scale(0.97); }
-      100% { opacity: 1;   transform: scale(1); }
+    @keyframes fadeIn {
+      0% { opacity: 0.5; transform: scale(0.97); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     
     .titlebar {
-      height: 35px;
+      height: 40px;
       background: rgba(50,50,50,0.8);
       display: flex;
       align-items: center;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
       position: relative;
     }
     .window-controls {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       padding-left: 8px;
       align-items: center;
+      -webkit-app-region: no-drag; 
+      position: relative;
     }
-    
     .win-btn {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       cursor: pointer;
+      position: relative;
     }
-    .win-btn.red { background: #ff5f57; }
+    .win-btn.red    { background: #ff5f57; }
     .win-btn.yellow { background: #ffbd2e; }
-    .win-btn.green { background: #28c940; }
+    .win-btn.green  { background: #28c940; }
 
     
+    .win-btn:hover::before {
+      content: attr(data-symbol);
+      color: #000;
+      position: absolute;
+      top: -2px;
+      left: 3px;
+      font-size: 12px;
+      opacity: 0.4;
+    }
+
     .drag-region {
       flex: 1;
       -webkit-app-region: drag;
     }
 
-    
+  
     .body-layout {
-      display: flex;
       flex: 1;
+      display: flex;
+      overflow: hidden;
     }
 
-    
+   
     .sidebar {
       width: 60px;
       background: rgba(40,40,40,0.9);
-      transition: width 0.3s ease;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      transition: width 0.3s;
     }
     .sidebar:hover {
-      width: 180px;
+      width: 200px;
     }
     .sidebar-top, .sidebar-bottom {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 8px 0;
+      padding-top: 10px;
     }
-
     .sidebar-item {
       width: 100%;
-      padding: 8px 12px;
       color: #ccc;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
       cursor: pointer;
       transition: background 0.2s, transform 0.2s;
     }
-    .sidebar-item i.material-icons {
-      margin-right: 8px;
-      font-size: 20px;
-    }
-    .sidebar-item span {
-      display: none; 
-    }
-    .sidebar:hover .sidebar-item span {
-      display: inline; 
-    }
     .sidebar-item:hover {
       background: rgba(100,100,100,0.2);
-      transform: scale(1.03);
+      transform: scale(1.02);
+    }
+    .sidebar-item i.material-icons {
+      margin-right: 8px;
+    }
+    .sidebar-text {
+      display: none;
+    }
+    .sidebar:hover .sidebar-text {
+      display: inline;
     }
 
-    
     .tab-list {
       flex: 1;
       width: 100%;
       overflow-y: auto;
+      margin-top: 10px;
     }
     .tab-item {
       background: rgba(80,80,80,0.6);
-      margin: 4px 10px;
+      margin: 4px 8px;
       padding: 6px;
       border-radius: 4px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      color: #ddd;
+      gap: 6px;
+      color: #eee;
       cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
-    }
-    .tab-item.active {
-      background: rgba(120,120,120,0.6);
+      transition: transform 0.2s;
     }
     .tab-item:hover {
-      transform: scale(1.02);
+      transform: scale(1.01);
     }
-    .tab-item i.material-icons {
-      font-size: 18px;
-      margin-left: 8px;
+    .tab-item.active {
+      background: rgba(120,120,120,0.5);
+    }
+    .favicon {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .tab-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 120px;
+    }
+    .tab-close-icon {
+      margin-left: auto;
       color: #aaa;
     }
-    .tab-item i.material-icons:hover {
+    .tab-close-icon:hover {
       color: #fff;
     }
 
-    /* Jobb oldali content: extension search + nav + webview */
+    
     .content-panel {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: rgba(30,30,30,0.85);
+      background: rgba(30,30,30,0.8);
     }
-    
-    .extension-search {
-      display: flex;
-      align-items: center;
-      background: rgba(50,50,50,0.8);
-      padding: 6px 8px;
-      gap: 10px;
-    }
-    .extension-search input {
-      flex: 1;
-      border: none;
-      border-radius: 4px;
-      padding: 6px 8px;
-      outline: none;
-    }
-    .extension-search button {
-      border: none;
-      background: #666;
-      color: #fff;
-      border-radius: 4px;
-      padding: 6px 12px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .extension-search button:hover {
-      background: #888;
-    }
-    .extension-results {
-      background: rgba(60,60,60,0.6);
-      padding: 8px;
-      height: 70px;
-      overflow-y: auto;
-    }
-    .ext-item {
-      margin-bottom: 6px;
-      border-bottom: 1px solid #777;
-      padding-bottom: 4px;
-    }
-    .ext-item .install-link {
-      color: #0af;
-      margin-left: 5px;
-      cursor: pointer;
-    }
-
-    /* Topbar nav (back/forward/reload + URL) */
-    .topbar {
+    .nav-bar {
       height: 45px;
-      background: rgba(45,45,45,0.8);
+      background: rgba(60,60,60,0.8);
       display: flex;
       align-items: center;
-      padding: 0 8px;
       gap: 8px;
+      padding: 0 8px;
     }
     .nav-buttons button {
       width: 36px;
@@ -228,13 +203,16 @@
       background: #666;
       color: #fff;
       border-radius: 4px;
-      font-size: 16px;
       cursor: pointer;
-      transition: background 0.2s, transform 0.2s;
+      position: relative;
     }
     .nav-buttons button:hover {
       background: #888;
-      transform: scale(1.04);
+    }
+    .nav-buttons button .material-icons {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
     }
     .url-bar {
       flex: 1;
@@ -247,305 +225,395 @@
       outline: none;
     }
 
-    /* A webview konténer */
     .webview-container {
       flex: 1;
       position: relative;
     }
+    
     webview {
+      display: none;
       width: 100%;
       height: 100%;
-      display: none;
+      border: none;
     }
+
+    
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none; 
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay-content {
+      background: #333;
+      border-radius: 8px;
+      padding: 20px;
+      color: #fff;
+      width: 400px;
+      max-height: 80%;
+      overflow-y: auto;
+    }
+    .overlay-content h2 {
+      margin-bottom: 10px;
+    }
+    .overlay-content button {
+      margin-top: 12px;
+      background: #666;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
   </style>
 </head>
+
 <body>
-  <div class="app-container">
-    <!-- titlebar, balra 3 kör, jobbra drag region -->
-    <div class="titlebar">
-      <div class="window-controls">
-        <div class="win-btn red" onclick="windowControl('close')"></div>
-        <div class="win-btn yellow" onclick="windowControl('minimize')"></div>
-        <div class="win-btn green" onclick="windowControl('maximize')"></div>
+<div class="app-container">
+ 
+  <div class="titlebar">
+    <div class="window-controls">
+      <div class="win-btn red"    data-symbol="×" onclick="windowControl('close')"></div>
+      <div class="win-btn yellow" data-symbol="–" onclick="windowControl('minimize')"></div>
+      <div class="win-btn green"  data-symbol="+" onclick="windowControl('maximize')"></div>
+    </div>
+    <div class="drag-region"></div>
+  </div>
+
+  <div class="body-layout">
+    
+    <div class="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-item" onclick="openNewTab()">
+          <i class="material-icons">add</i>
+          <span class="sidebar-text">Új fül</span>
+        </div>
       </div>
-      <div class="drag-region"></div>
+      <div class="tab-list" id="tabList"></div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-item" onclick="showFavorites()">
+          <i class="material-icons">star</i>
+          <span class="sidebar-text">Kedvencek</span>
+        </div>
+        <div class="sidebar-item" onclick="showHistory()">
+          <i class="material-icons">history</i>
+          <span class="sidebar-text">Előzmények</span>
+        </div>
+        <div class="sidebar-item" onclick="pickExtensionInstall()">
+          <i class="material-icons">extension</i>
+          <span class="sidebar-text">Bővítmények</span>
+        </div>
+      </div>
     </div>
 
-    <div class="body-layout">
-     
-      <div class="sidebar">
-        <div class="sidebar-top">
-          <div class="sidebar-item" onclick="openNewTab()">
-            <i class="material-icons">add</i>
-            <span>Új fül</span>
-          </div>
-          <div class="sidebar-item" onclick="openBookmarks()">
-            <i class="material-icons">star</i>
-            <span>Kedvencek</span>
-          </div>
-          <div class="sidebar-item" onclick="openHistory()">
-            <i class="material-icons">history</i>
-            <span>Előzmények</span>
-          </div>
+   
+    <div class="content-panel">
+      <div class="nav-bar">
+        <div class="nav-buttons">
+          <button id="backBtn"><span class="material-icons">arrow_back</span></button>
+          <button id="forwardBtn"><span class="material-icons">arrow_forward</span></button>
+          <button id="reloadBtn"><span class="material-icons">autorenew</span></button>
         </div>
-        <div class="tab-list" id="tabList"></div>
-        <div class="sidebar-bottom">
-          <div class="sidebar-item" onclick="pickExtensionInstall()">
-            <i class="material-icons">extension</i>
-            <span>Bőv. telepít</span>
-          </div>
-        </div>
+        <input type="text" class="url-bar" id="urlBar" placeholder="Írj be URL-t vagy keresőszót..." />
+        <button id="favBtn" style="width:40px; height:36px; background:#666; color:#fff; border:none; border-radius:4px; cursor:pointer;">
+          <span class="material-icons" style="position:absolute; transform:translate(-50%,-50%); top:50%; left:50%;">star_outline</span>
+        </button>
       </div>
-
-      <!-- Jobb oldali content: extension search + nav + webview -->
-      <div class="content-panel">
-       
-        <div class="extension-search">
-          <input type="text" id="extensionSearchInput" placeholder="Bővítmény keresése (pl. React)..." />
-          <button onclick="searchExtensions()">Keresés</button>
-        </div>
-        <div class="extension-results" id="extensionResults"></div>
-
-       
-        <div class="topbar">
-          <div class="nav-buttons">
-            <button id="backBtn">
-              <span class="material-icons">arrow_back</span>
-            </button>
-            <button id="forwardBtn">
-              <span class="material-icons">arrow_forward</span>
-            </button>
-            <button id="reloadBtn">
-              <span class="material-icons">autorenew</span>
-            </button>
-          </div>
-          <input type="text" class="url-bar" id="urlBar" placeholder="Írj be URL-t vagy keresőszót..." />
-        </div>
-
-       
-        <div class="webview-container" id="webviewContainer"></div>
+      <div class="webview-container" id="webviewContainer">
+        
       </div>
     </div>
   </div>
 
-  <script>
-    const { ipcRenderer } = require('electron');
+  
+  <div class="overlay" id="historyOverlay">
+    <div class="overlay-content" id="historyContent">
+      <h2>Előzmények</h2>
+      <div id="historyList"></div>
+      <button onclick="closeHistory()">Bezár</button>
+    </div>
+  </div>
+  <div class="overlay" id="favoritesOverlay">
+    <div class="overlay-content">
+      <h2>Kedvencek</h2>
+      <div id="favoritesList"></div>
+      <button onclick="closeFavorites()">Bezár</button>
+    </div>
+  </div>
+</div>
 
-    let tabs = []; // {id, title, url, webviewEl, isActive}
-    let currentTabId = null;
+<script>
+const { ipcRenderer } = require('electron');
 
-    let historyList = [];
-    let bookmarks = [];
+let tabs = [];  // {id, title, url, webviewEl, iconUrl, isActive}
+let currentTabId = null;
 
-    const tabListEl = document.getElementById('tabList');
-    const webviewContainerEl = document.getElementById('webviewContainer');
-    const extensionResultsEl = document.getElementById('extensionResults');
-    const extensionSearchInput = document.getElementById('extensionSearchInput');
+let historyArray = [];  // { url, title, time }
 
-    const backBtn = document.getElementById('backBtn');
-    const forwardBtn = document.getElementById('forwardBtn');
-    const reloadBtn = document.getElementById('reloadBtn');
-    const urlBar = document.getElementById('urlBar');
 
-    
-    function windowControl(action) {
-      ipcRenderer.invoke('windowControl', action);
-    }
+const tabListEl = document.getElementById('tabList');
+const webviewContainerEl = document.getElementById('webviewContainer');
+const backBtn = document.getElementById('backBtn');
+const forwardBtn = document.getElementById('forwardBtn');
+const reloadBtn = document.getElementById('reloadBtn');
+const urlBar = document.getElementById('urlBar');
+const favBtn = document.getElementById('favBtn');
 
-    
-    function openNewTab(url = 'https://www.google.com') {
-      const tabId = Date.now().toString();
-      const webview = document.createElement('webview');
-      webview.src = url;
-      webview.setAttribute('allowpopups', 'true');
-      webview.style.display = 'none';
-      webviewContainerEl.appendChild(webview);
+const historyOverlay = document.getElementById('historyOverlay');
+const historyListEl = document.getElementById('historyList');
+const favoritesOverlay = document.getElementById('favoritesOverlay');
+const favoritesListEl = document.getElementById('favoritesList');
 
-      const newTab = {
-        id: tabId,
-        title: 'Új fül',
-        url,
-        webviewEl: webview,
-        isActive: false
-      };
-      tabs.push(newTab);
 
-      
-      webview.addEventListener('page-title-updated', () => {
-        newTab.title = webview.getTitle();
-        updateTabListUI();
-      });
-      webview.addEventListener('did-stop-loading', () => {
-        newTab.url = webview.getURL();
-        urlBar.value = newTab.url;
-        
-        historyList.push({ url: newTab.url, title: newTab.title, time: new Date() });
-      });
+function windowControl(action) {
+  ipcRenderer.invoke('windowControl', action);
+}
 
-      setActiveTab(tabId);
-    }
 
-    function setActiveTab(tabId) {
-      
-      if (currentTabId) {
-        const oldTab = tabs.find(t => t.id === currentTabId);
-        if (oldTab) {
-          oldTab.isActive = false;
-          oldTab.webviewEl.style.display = 'none';
-        }
-      }
-      
-      const newTab = tabs.find(t => t.id === tabId);
-      if (newTab) {
-        newTab.isActive = true;
-        newTab.webviewEl.style.display = 'block';
-        currentTabId = newTab.id;
-        urlBar.value = newTab.url || '';
-      }
-      updateTabListUI();
-    }
+function openNewTab(url='https://www.google.com') {
+  const tabId = Date.now().toString();
+  const webview = document.createElement('webview');
+  webview.setAttribute('partition', 'persist:velox');
+  webview.src = url;
+  webview.setAttribute('allowpopups', 'true');
+  webview.style.display = 'none';
+  webviewContainerEl.appendChild(webview);
 
-    function closeTab(tabId) {
-      const idx = tabs.findIndex(t => t.id === tabId);
-      if (idx !== -1) {
-        const closingTab = tabs[idx];
-        webviewContainerEl.removeChild(closingTab.webviewEl);
-        tabs.splice(idx, 1);
+  const newTab = {
+    id: tabId,
+    title: 'Új fül',
+    url,
+    iconUrl: '',
+    webviewEl: webview,
+    isActive: false
+  };
+  tabs.push(newTab);
 
-        if (tabId === currentTabId) {
-          if (tabs.length > 0) {
-            setActiveTab(tabs[tabs.length - 1].id);
-          } else {
-            currentTabId = null;
-            urlBar.value = '';
-          }
-        }
-      }
-      updateTabListUI();
-    }
 
-    function updateTabListUI() {
-      tabListEl.innerHTML = '';
-      tabs.forEach(tab => {
-        const tabDiv = document.createElement('div');
-        tabDiv.classList.add('tab-item');
-        if (tab.isActive) tabDiv.classList.add('active');
-        
-        
-        const shortTitle = tab.title.length > 14 ? tab.title.slice(0,14)+'...' : tab.title;
-        tabDiv.innerHTML = `
-          <span>${shortTitle}</span>
-          <i class="material-icons">close</i>
-        `;
-        tabDiv.addEventListener('click', () => setActiveTab(tab.id));
-        const closeIcon = tabDiv.querySelector('.material-icons');
-        closeIcon.addEventListener('click', (e) => {
-          e.stopPropagation();
-          closeTab(tab.id);
-        });
-
-        tabListEl.appendChild(tabDiv);
-      });
-    }
-
-   
-    backBtn.addEventListener('click', () => {
-      const tab = getCurrentTab();
-      if (tab?.webviewEl.canGoBack()) tab.webviewEl.goBack();
-    });
-    forwardBtn.addEventListener('click', () => {
-      const tab = getCurrentTab();
-      if (tab?.webviewEl.canGoForward()) tab.webviewEl.goForward();
-    });
-    reloadBtn.addEventListener('click', () => {
-      const tab = getCurrentTab();
-      if (tab) tab.webviewEl.reload();
-    });
-    urlBar.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const input = urlBar.value.trim();
-        navigateTo(decideUrl(input));
-      }
-    });
-
-    function decideUrl(input) {
-      
-      if (/^https?:\/\//i.test(input)) {
-        return input;
-      }
-      return 'https://www.google.com/search?q=' + encodeURIComponent(input);
-    }
-
-    function navigateTo(url) {
-      const tab = getCurrentTab();
-      if (tab) tab.webviewEl.loadURL(url);
-    }
-    function getCurrentTab() {
-      return tabs.find(t => t.id === currentTabId);
-    }
+  webview.addEventListener('page-title-updated', () => {
+    newTab.title = webview.getTitle();
+  });
+  webview.addEventListener('did-stop-loading', () => {
+    newTab.url = webview.getURL();
+    urlBar.value = newTab.url;
 
     
-    function openHistory() {
-      let msg = 'Előzmények (utolsó 5):\n';
-      historyList.slice(-5).forEach(h => {
-        msg += `[${h.time.toLocaleTimeString()}] ${h.title} [${h.url}]\n`;
-      });
-      alert(msg);
-    }
-    function openBookmarks() {
-      let msg = 'Könyvjelzők:\n';
-      bookmarks.forEach(b => {
-        msg += `${b.title} - ${b.url}\n`;
-      });
-      alert(msg);
-    }
+    const domain = (new URL(newTab.url)).hostname;
+    newTab.iconUrl = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64';
 
     
-    async function pickExtensionInstall() {
-      const dirPath = await ipcRenderer.invoke('pickExtensionDirectory');
-      if (!dirPath) {
-        alert("Nincs mappa kiválasztva.");
-        return;
-      }
-      const result = await ipcRenderer.invoke('installExtension', dirPath);
-      if (result.success) {
-        alert("Bővítmény telepítve: " + result.name);
+    historyArray.push({
+      url: newTab.url,
+      title: newTab.title,
+      time: new Date()
+    });
+
+    updateTabListUI();
+  });
+
+  setActiveTab(tabId);
+}
+
+function setActiveTab(tabId) {
+  if (currentTabId) {
+    const oldTab = tabs.find(t => t.id === currentTabId);
+    if (oldTab) {
+      oldTab.isActive = false;
+      oldTab.webviewEl.style.display = 'none';
+    }
+  }
+  const newTab = tabs.find(t => t.id === tabId);
+  if (newTab) {
+    newTab.isActive = true;
+    newTab.webviewEl.style.display = 'block';
+    currentTabId = newTab.id;
+    urlBar.value = newTab.url || '';
+  }
+  updateTabListUI();
+}
+
+function closeTab(tabId) {
+  const idx = tabs.findIndex(t => t.id === tabId);
+  if (idx > -1) {
+    const closingTab = tabs[idx];
+    webviewContainerEl.removeChild(closingTab.webviewEl);
+    tabs.splice(idx, 1);
+
+    if (closingTab.id === currentTabId) {
+      if (tabs.length > 0) {
+        setActiveTab(tabs[tabs.length - 1].id);
       } else {
-        alert("Hiba: " + result.error);
+        currentTabId = null;
+        urlBar.value = '';
       }
     }
+  }
+  updateTabListUI();
+}
 
-    
-    async function searchExtensions() {
-      const query = extensionSearchInput.value.trim();
-      if (!query) {
-        extensionResultsEl.innerHTML = '<i>Nincs beírva keresőszó</i>';
-        return;
-      }
-      const found = await ipcRenderer.invoke('searchExtensions', query);
-      if (!found || found.length === 0) {
-        extensionResultsEl.innerHTML = '<i>Nincs találat</i>';
-        return;
-      }
-      let html = '';
-      found.forEach(ext => {
-        html += `
-          <div class="ext-item">
-            <b>${ext.name}</b> – ${ext.description}
-            <span class="install-link" onclick="demoInstall('${ext.name}')">[Install]</span>
-          </div>
-        `;
-      });
-      extensionResultsEl.innerHTML = html;
-    }
-    function demoInstall(name) {
-      alert(`(Demo) Telepítve: ${name}`);
-    }
+function updateTabListUI() {
+  tabListEl.innerHTML = '';
+  tabs.forEach(tab => {
+    const tabDiv = document.createElement('div');
+    tabDiv.classList.add('tab-item');
+    if (tab.isActive) tabDiv.classList.add('active');
 
-    
-    window.addEventListener('DOMContentLoaded', () => {
-      openNewTab();
+
+    const favImg = document.createElement('img');
+    favImg.className = 'favicon';
+    favImg.src = tab.iconUrl || 'https://www.google.com/s2/favicons?domain=google.com&sz=64';
+
+  
+    const titleSpan = document.createElement('span');
+    titleSpan.classList.add('tab-title');
+    titleSpan.textContent = tab.title;
+
+ 
+    const closeIcon = document.createElement('i');
+    closeIcon.classList.add('material-icons', 'tab-close-icon');
+    closeIcon.textContent = 'close';
+    closeIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeTab(tab.id);
     });
-  </script>
+
+    tabDiv.addEventListener('click', () => setActiveTab(tab.id));
+
+    tabDiv.appendChild(favImg);
+    tabDiv.appendChild(titleSpan);
+    tabDiv.appendChild(closeIcon);
+
+    tabListEl.appendChild(tabDiv);
+  });
+}
+
+
+backBtn.addEventListener('click', () => {
+  const tab = getCurrentTab();
+  if (tab && tab.webviewEl.canGoBack()) {
+    tab.webviewEl.goBack();
+  }
+});
+forwardBtn.addEventListener('click', () => {
+  const tab = getCurrentTab();
+  if (tab && tab.webviewEl.canGoForward()) {
+    tab.webviewEl.goForward();
+  }
+});
+reloadBtn.addEventListener('click', () => {
+  const tab = getCurrentTab();
+  if (tab) tab.webviewEl.reload();
+});
+
+
+urlBar.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const input = urlBar.value.trim();
+    navigateTo(decideUrl(input));
+  }
+});
+function decideUrl(input) {
+  if (/^https?:\/\//i.test(input)) {
+    return input;
+  } 
+
+  return 'https://www.google.com/search?q=' + encodeURIComponent(input);
+}
+function navigateTo(url) {
+  const tab = getCurrentTab();
+  if (tab) tab.webviewEl.loadURL(url);
+}
+function getCurrentTab() {
+  return tabs.find(t => t.isActive);
+}
+
+
+favBtn.addEventListener('click', async () => {
+  const tab = getCurrentTab();
+  if (tab) {
+    const res = await ipcRenderer.invoke('addFavorite', {
+      title: tab.title,
+      url: tab.url
+    });
+    alert('Hozzáadva kedvencekhez!');
+  }
+});
+async function showFavorites() {
+  favoritesListEl.innerHTML = '';
+  const favs = await ipcRenderer.invoke('getFavorites');
+  if (favs.length === 0) {
+    favoritesListEl.innerHTML = '<i>Nincs kedvenc eltárolva.</i>';
+  } else {
+    favs.forEach(f => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '5px';
+      div.innerHTML = `<b>${f.title}</b> – <a href="#">${f.url}</a>`;
+      
+      const link = div.querySelector('a');
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        openNewTab(f.url);
+      });
+      favoritesListEl.appendChild(div);
+    });
+  }
+  favoritesOverlay.style.display = 'flex';
+}
+function closeFavorites() {
+  favoritesOverlay.style.display = 'none';
+}
+
+
+function showHistory() {
+  historyListEl.innerHTML = '';
+  if (historyArray.length === 0) {
+    historyListEl.innerHTML = '<i>Még nincs előzmény.</i>';
+  } else {
+    
+    const reversed = [...historyArray].reverse();
+    reversed.forEach(item => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '5px';
+      div.innerHTML = `[${item.time.toLocaleTimeString()}] <b>${item.title}</b> – <a href="#">${item.url}</a>`;
+      const link = div.querySelector('a');
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        openNewTab(item.url);
+        closeHistory();
+      });
+      historyListEl.appendChild(div);
+    });
+  }
+  historyOverlay.style.display = 'flex';
+}
+function closeHistory() {
+  historyOverlay.style.display = 'none';
+}
+
+
+async function pickExtensionInstall() {
+  const dirPath = await ipcRenderer.invoke('pickExtensionDirectory');
+  if (!dirPath) {
+    alert("Nincs mappa kiválasztva vagy megszakítva.");
+    return;
+  }
+  const result = await ipcRenderer.invoke('installExtension', dirPath);
+  if (result.success) {
+    alert("Bővítmény telepítve: " + result.name);
+  } else {
+    alert("Hiba: " + result.error);
+  }
+}
+
+
+window.addEventListener('DOMContentLoaded', () => {
+  openNewTab();
+});
+</script>
 </body>
 </html>

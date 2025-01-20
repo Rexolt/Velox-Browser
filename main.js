@@ -1,14 +1,17 @@
-
 const { app, BrowserWindow, ipcMain, dialog, session } = require('electron');
 const path = require('path');
 
 
+let favorites = [];
+
+
 const extensionStore = [
-  { name: 'React DevTools', description: 'React alkalmazások debug' },
-  { name: 'Vue DevTools', description: 'Vue.js debug eszközök' },
-  { name: 'Redux DevTools', description: 'Redux statekezelés nyomonkövetése' },
-  { name: 'Angular Augury', description: 'Angular appok elemzése' }
+  { name: 'React DevTools', description: 'React alkalmazások debug eszközei' },
+  { name: 'Vue DevTools', description: 'Vue.js debug és performance eszközök' },
+  { name: 'Redux DevTools', description: 'Redux state kezelés debug' },
+  { name: 'Angular Augury', description: 'Angular alkalmazások elemzése' }
 ];
+
 
 let mainWindow = null;
 
@@ -16,39 +19,36 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    frame: false,          
-    transparent: true,     
+    frame: false,             
+    transparent: true,        
     backgroundColor: '#00000000',
-    resizable: true,
     webPreferences: {
-      
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: true,  
+      contextIsolation: false,
+      webviewTag: true        
     }
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
-
+  
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 }
 
-app.whenReady().then(() => {
-  createWindow();
+app.whenReady().then(createWindow);
+
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
+
 app.on('window-all-closed', () => {
-  
   if (process.platform !== 'darwin') app.quit();
 });
 
-app.on('activate', () => {
 
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
-});
 
 
 ipcMain.handle('windowControl', (event, action) => {
@@ -67,16 +67,30 @@ ipcMain.handle('windowControl', (event, action) => {
   }
 });
 
+
+ipcMain.handle('addFavorite', (event, { title, url }) => {
+
+  const exists = favorites.find(fav => fav.url === url);
+  if (!exists) {
+    favorites.push({ title, url, time: new Date() });
+  }
+  return favorites; 
+});
+ipcMain.handle('getFavorites', () => {
+  return favorites;
+});
+
+
 ipcMain.handle('pickExtensionDirectory', async (event) => {
   const bw = BrowserWindow.fromWebContents(event.sender);
   const result = await dialog.showOpenDialog(bw, {
     properties: ['openDirectory']
   });
-  if (result.canceled || !result.filePaths[0]) return null;
+  if (result.canceled || !result.filePaths[0]) {
+    return null;
+  }
   return result.filePaths[0];
 });
-
-
 ipcMain.handle('installExtension', async (event, dirPath) => {
   try {
     const loaded = await session.defaultSession.loadExtension(dirPath);
@@ -89,8 +103,8 @@ ipcMain.handle('installExtension', async (event, dirPath) => {
 
 ipcMain.handle('searchExtensions', (event, query) => {
   const q = query.toLowerCase();
-  const results = extensionStore.filter(item => {
-    return item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
-  });
-  return results;
+  return extensionStore.filter(ext =>
+    ext.name.toLowerCase().includes(q) ||
+    ext.description.toLowerCase().includes(q)
+  );
 });
