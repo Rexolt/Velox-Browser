@@ -1,8 +1,8 @@
-// main.js
+
 const { app, BrowserWindow, ipcMain, dialog, session } = require('electron');
 const path = require('path');
 
-// Dummy bővítmény-adat a keresőhöz
+
 const extensionStore = [
   { name: 'React DevTools', description: 'React alkalmazások debug' },
   { name: 'Vue DevTools', description: 'Vue.js debug eszközök' },
@@ -16,13 +16,12 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    frame: false,          // Egyedi keret
-    transparent: true,     // Átlátszó -> lehet kerekítés
+    frame: false,          
+    transparent: true,     
     backgroundColor: '#00000000',
     resizable: true,
     webPreferences: {
-      // DEMÓ: nodeIntegration = true, 
-      // élesben javasolt a preload.js + contextIsolation
+      
       nodeIntegration: true,
       contextIsolation: false
     }
@@ -40,20 +39,18 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  // Windows, Linux: bezárjuk az appot, ha nincs ablak
+  
   if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('activate', () => {
-  // macOS: ha nincs ablak, de az app fut, új ablakot hozunk létre
+
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
 
-/* IPC-kezelők: */
 
-// Ablakvezérlés
 ipcMain.handle('windowControl', (event, action) => {
   const bw = BrowserWindow.fromWebContents(event.sender);
   switch (action) {
@@ -70,7 +67,6 @@ ipcMain.handle('windowControl', (event, action) => {
   }
 });
 
-// Bővítmény mappa kiválasztása
 ipcMain.handle('pickExtensionDirectory', async (event) => {
   const bw = BrowserWindow.fromWebContents(event.sender);
   const result = await dialog.showOpenDialog(bw, {
@@ -80,7 +76,7 @@ ipcMain.handle('pickExtensionDirectory', async (event) => {
   return result.filePaths[0];
 });
 
-// Bővítmény telepítése
+
 ipcMain.handle('installExtension', async (event, dirPath) => {
   try {
     const loaded = await session.defaultSession.loadExtension(dirPath);
@@ -90,7 +86,7 @@ ipcMain.handle('installExtension', async (event, dirPath) => {
   }
 });
 
-// Bővítmény keresése
+
 ipcMain.handle('searchExtensions', (event, query) => {
   const q = query.toLowerCase();
   const results = extensionStore.filter(item => {

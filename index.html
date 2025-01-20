@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Velox Minimal Rounded</title>
-  <!-- Google Fonts (Roboto + Material Icons) -->
+  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link 
     href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
@@ -15,7 +15,7 @@
   />
 
   <style>
-    /* Alap stílus */
+   
     * {
       margin: 0;
       padding: 0;
@@ -30,11 +30,11 @@
       overflow: hidden;
     }
 
-    /* Az app “doboz”, kicsit kerekített, sötét, minimál */
+   
     .app-container {
       width: 100%;
       height: 100%;
-      border-radius: 10px; /* Kevésbé kerek */
+      border-radius: 10px; 
       background: rgba(30,30,30,0.94);
       overflow: hidden;
       display: flex;
@@ -42,13 +42,13 @@
       animation: fadeZoom 0.5s ease forwards;
     }
 
-    /* Induló animáció az egész ablakon */
+    
     @keyframes fadeZoom {
       0%   { opacity: 0.5; transform: scale(0.97); }
       100% { opacity: 1;   transform: scale(1); }
     }
 
-    /* Címsor - minimalista, bal oldalon 3 kör Mac-szerű */
+    
     .titlebar {
       height: 35px;
       background: rgba(50,50,50,0.8);
@@ -62,7 +62,7 @@
       padding-left: 8px;
       align-items: center;
     }
-    /* Kicsit kisebb gombok: 16px */
+    
     .win-btn {
       width: 16px;
       height: 16px;
@@ -73,19 +73,19 @@
     .win-btn.yellow { background: #ffbd2e; }
     .win-btn.green { background: #28c940; }
 
-    /* Drag region */
+    
     .drag-region {
       flex: 1;
       -webkit-app-region: drag;
     }
 
-    /* Belső layout: sidebar + content */
+    
     .body-layout {
       display: flex;
       flex: 1;
     }
 
-    /* Sidebar (Arc-szerű animáció, minimal dizájn) */
+    
     .sidebar {
       width: 60px;
       background: rgba(40,40,40,0.9);
@@ -128,7 +128,7 @@
       transform: scale(1.03);
     }
 
-    /* Fül-lista */
+    
     .tab-list {
       flex: 1;
       width: 100%;
@@ -168,7 +168,7 @@
       flex-direction: column;
       background: rgba(30,30,30,0.85);
     }
-    /* Bővítmény kereső sáv */
+    
     .extension-search {
       display: flex;
       align-items: center;
@@ -261,7 +261,7 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Minimalista titlebar, balra 3 kör, jobbra drag region -->
+    <!-- titlebar, balra 3 kör, jobbra drag region -->
     <div class="titlebar">
       <div class="window-controls">
         <div class="win-btn red" onclick="windowControl('close')"></div>
@@ -272,7 +272,7 @@
     </div>
 
     <div class="body-layout">
-      <!-- Oldalsáv -->
+     
       <div class="sidebar">
         <div class="sidebar-top">
           <div class="sidebar-item" onclick="openNewTab()">
@@ -299,14 +299,14 @@
 
       <!-- Jobb oldali content: extension search + nav + webview -->
       <div class="content-panel">
-        <!-- Bővítmény kereső sáv -->
+       
         <div class="extension-search">
           <input type="text" id="extensionSearchInput" placeholder="Bővítmény keresése (pl. React)..." />
           <button onclick="searchExtensions()">Keresés</button>
         </div>
         <div class="extension-results" id="extensionResults"></div>
 
-        <!-- Navigációs sáv + URL -->
+       
         <div class="topbar">
           <div class="nav-buttons">
             <button id="backBtn">
@@ -322,7 +322,7 @@
           <input type="text" class="url-bar" id="urlBar" placeholder="Írj be URL-t vagy keresőszót..." />
         </div>
 
-        <!-- Webview-ek: mindet rejtjük, csak az aktív tab látszik -->
+       
         <div class="webview-container" id="webviewContainer"></div>
       </div>
     </div>
@@ -347,12 +347,12 @@
     const reloadBtn = document.getElementById('reloadBtn');
     const urlBar = document.getElementById('urlBar');
 
-    // Ablakvezérlés
+    
     function windowControl(action) {
       ipcRenderer.invoke('windowControl', action);
     }
 
-    // Új fül
+    
     function openNewTab(url = 'https://www.google.com') {
       const tabId = Date.now().toString();
       const webview = document.createElement('webview');
@@ -370,7 +370,7 @@
       };
       tabs.push(newTab);
 
-      // Események
+      
       webview.addEventListener('page-title-updated', () => {
         newTab.title = webview.getTitle();
         updateTabListUI();
@@ -378,7 +378,7 @@
       webview.addEventListener('did-stop-loading', () => {
         newTab.url = webview.getURL();
         urlBar.value = newTab.url;
-        // Előzményekbe
+        
         historyList.push({ url: newTab.url, title: newTab.title, time: new Date() });
       });
 
@@ -386,7 +386,7 @@
     }
 
     function setActiveTab(tabId) {
-      // Inaktiválás
+      
       if (currentTabId) {
         const oldTab = tabs.find(t => t.id === currentTabId);
         if (oldTab) {
@@ -394,7 +394,7 @@
           oldTab.webviewEl.style.display = 'none';
         }
       }
-      // Aktiválás
+      
       const newTab = tabs.find(t => t.id === tabId);
       if (newTab) {
         newTab.isActive = true;
@@ -431,7 +431,7 @@
         tabDiv.classList.add('tab-item');
         if (tab.isActive) tabDiv.classList.add('active');
         
-        // Rövidített cím
+        
         const shortTitle = tab.title.length > 14 ? tab.title.slice(0,14)+'...' : tab.title;
         tabDiv.innerHTML = `
           <span>${shortTitle}</span>
@@ -448,7 +448,7 @@
       });
     }
 
-    // Navigáció
+   
     backBtn.addEventListener('click', () => {
       const tab = getCurrentTab();
       if (tab?.webviewEl.canGoBack()) tab.webviewEl.goBack();
@@ -469,7 +469,7 @@
     });
 
     function decideUrl(input) {
-      // Ha http/https, betöltjük, különben Google-keresés
+      
       if (/^https?:\/\//i.test(input)) {
         return input;
       }
@@ -484,7 +484,7 @@
       return tabs.find(t => t.id === currentTabId);
     }
 
-    // Előzmények, Kedvencek
+    
     function openHistory() {
       let msg = 'Előzmények (utolsó 5):\n';
       historyList.slice(-5).forEach(h => {
@@ -500,7 +500,7 @@
       alert(msg);
     }
 
-    // Bővítmény telepítése
+    
     async function pickExtensionInstall() {
       const dirPath = await ipcRenderer.invoke('pickExtensionDirectory');
       if (!dirPath) {
@@ -515,7 +515,7 @@
       }
     }
 
-    // Bővítmény keresése
+    
     async function searchExtensions() {
       const query = extensionSearchInput.value.trim();
       if (!query) {
@@ -542,7 +542,7 @@
       alert(`(Demo) Telepítve: ${name}`);
     }
 
-    // Induláskor
+    
     window.addEventListener('DOMContentLoaded', () => {
       openNewTab();
     });
