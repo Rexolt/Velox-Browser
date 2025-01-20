@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <title>Velox Browser</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" 
+    rel="stylesheet"
+  />
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Material+Icons"
+    rel="stylesheet"
+  />
+ 
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+<div class="app-container">
+ 
+  <div class="titlebar">
+    <div class="window-controls">
+      <div class="win-btn red"    data-symbol="×" onclick="windowControl('close')"></div>
+      <div class="win-btn yellow" data-symbol="–" onclick="windowControl('minimize')"></div>
+      <div class="win-btn green"  data-symbol="+" onclick="windowControl('maximize')"></div>
+    </div>
+    <div class="drag-region"></div>
+  </div>
+
+  
+  <div class="body-layout">
+    
+    <div class="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-item" onclick="openNewTab()">
+          <i class="material-icons">add</i>
+          <span class="sidebar-text">Új fül</span>
+        </div>
+      </div>
+      <div class="tab-list" id="tabList"></div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-item" onclick="showFavorites()">
+          <i class="material-icons">star</i>
+          <span class="sidebar-text">Kedvencek</span>
+        </div>
+        <div class="sidebar-item" onclick="showHistory()">
+          <i class="material-icons">history</i>
+          <span class="sidebar-text">Előzmények</span>
+        </div>
+        <div class="sidebar-item" onclick="pickExtensionInstall()">
+          <i class="material-icons">extension</i>
+          <span class="sidebar-text">Bővítmények</span>
+        </div>
+        <div class="sidebar-item" onclick="showSettings()">
+          <i class="material-icons">settings</i>
+          <span class="sidebar-text">Beállítások</span>
+        </div>
+      </div>
+    </div>
+
+ 
+    <div class="content-panel">
+      <div class="nav-bar">
+        <div class="nav-buttons">
+          <button id="backBtn"><span class="material-icons">arrow_back</span></button>
+          <button id="forwardBtn"><span class="material-icons">arrow_forward</span></button>
+          <button id="reloadBtn"><span class="material-icons">autorenew</span></button>
+        </div>
+        <input type="text" class="url-bar" id="urlBar" placeholder="Írj be URL-t vagy keresőszót..." />
+        <button id="favBtn" class="fav-button">
+          <span class="material-icons">star_outline</span>
+        </button>
+      </div>
+      <div class="webview-container" id="webviewContainer">
+     
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="overlay" id="historyOverlay">
+    <div class="overlay-content" id="historyContent">
+      <h2>Előzmények</h2>
+      <div id="historyList"></div>
+      <button onclick="closeHistory()">Bezár</button>
+    </div>
+  </div>
+
+
+  <div class="overlay" id="favoritesOverlay">
+    <div class="overlay-content">
+      <h2>Kedvencek</h2>
+      <div id="favoritesList"></div>
+      <button onclick="closeFavorites()">Bezár</button>
+    </div>
+  </div>
+
+
+
+  <div class="overlay" id="settingsOverlay">
+    <div class="overlay-content">
+      <h2>Beállítások</h2>
+      <p> 
+        
+      </p>
+      <div>
+        <label>
+          <input type="checkbox" id="hardwareAccelToggle" />
+          Hardveres gyorsítás engedélyezése
+        </label>
+      </div>
+      <div style="margin-top: 8px;">
+        <label>
+          <input type="checkbox" id="sandboxToggle" />
+          Sandbox engedélyezése
+        </label>
+      </div>
+      <button style="margin-top: 12px;" onclick="saveSettings()">Mentés</button>
+      <button style="margin-left: 8px;" onclick="closeSettings()">Mégse</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="render.js"></script>
+</body>
+</html>

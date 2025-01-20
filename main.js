@@ -1,10 +1,15 @@
+
 const { app, BrowserWindow, ipcMain, dialog, session } = require('electron');
 const path = require('path');
 
 
+const userDataPath = path.join(process.cwd(), 'veloxUserData');
+app.setPath('userData', userDataPath);
+
+
+app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling');
+
 let favorites = [];
-
-
 const extensionStore = [
   { name: 'React DevTools', description: 'React alkalmazások debug eszközei' },
   { name: 'Vue DevTools', description: 'Vue.js debug és performance eszközök' },
@@ -13,28 +18,35 @@ const extensionStore = [
 ];
 
 
+
+
 let mainWindow = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    frame: false,             
-    transparent: true,        
+    frame: false,
+    transparent: true,
     backgroundColor: '#00000000',
     webPreferences: {
-      nodeIntegration: true,  
+      nodeIntegration: true,
       contextIsolation: false,
-      webviewTag: true        
+      webviewTag: true,
+      sandbox: false, 
+     
+      devTools: true
     }
   });
 
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
   
+  mainWindow.loadFile(path.join(__dirname, 'app', 'index.html'));
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 }
+
 
 app.whenReady().then(createWindow);
 
@@ -47,8 +59,6 @@ app.on('activate', () => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
-
-
 
 
 ipcMain.handle('windowControl', (event, action) => {
@@ -67,19 +77,16 @@ ipcMain.handle('windowControl', (event, action) => {
   }
 });
 
-
 ipcMain.handle('addFavorite', (event, { title, url }) => {
-
   const exists = favorites.find(fav => fav.url === url);
   if (!exists) {
     favorites.push({ title, url, time: new Date() });
   }
-  return favorites; 
+  return favorites;
 });
 ipcMain.handle('getFavorites', () => {
   return favorites;
 });
-
 
 ipcMain.handle('pickExtensionDirectory', async (event) => {
   const bw = BrowserWindow.fromWebContents(event.sender);
@@ -91,6 +98,7 @@ ipcMain.handle('pickExtensionDirectory', async (event) => {
   }
   return result.filePaths[0];
 });
+
 ipcMain.handle('installExtension', async (event, dirPath) => {
   try {
     const loaded = await session.defaultSession.loadExtension(dirPath);
@@ -99,7 +107,6 @@ ipcMain.handle('installExtension', async (event, dirPath) => {
     return { success: false, error: err.message };
   }
 });
-
 
 ipcMain.handle('searchExtensions', (event, query) => {
   const q = query.toLowerCase();
