@@ -1,95 +1,100 @@
-
-const { app, BrowserWindow, ipcMain, session, dialog } = require('electron');
+// main.js
+const { app, BrowserWindow, ipcMain, dialog, session } = require('electron');
 const path = require('path');
 
-
+// Dummy bővítmény-adat a keresőhöz
 const extensionStore = [
-  { name: 'React DevTools', description: 'React appok fejlesztőeszköze' },
-  { name: 'Vue DevTools', description: 'Vue.js fejlesztőeszközök' },
-  { name: 'Redux DevTools', description: 'Redux állapotkezelés debug' },
+  { name: 'React DevTools', description: 'React alkalmazások debug' },
+  { name: 'Vue DevTools', description: 'Vue.js debug eszközök' },
+  { name: 'Redux DevTools', description: 'Redux statekezelés nyomonkövetése' },
+  { name: 'Angular Augury', description: 'Angular appok elemzése' }
 ];
 
+let mainWindow = null;
+
 function createWindow() {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    frame: false,                
-    backgroundColor: '#1e1e1e',  
-    webPreferences: { 
-
-      nodeIntegration: true,     
-      contextIsolation: false,
-    },
+    frame: false,          // Egyedi keret
+    transparent: true,     // Átlátszó -> lehet kerekítés
+    backgroundColor: '#00000000',
+    resizable: true,
+    webPreferences: {
+      // DEMÓ: nodeIntegration = true, 
+      // élesben javasolt a preload.js + contextIsolation
+      nodeIntegration: true,
+      contextIsolation: false
+    }
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 }
 
 app.whenReady().then(() => {
   createWindow();
 });
 
-
 app.on('window-all-closed', () => {
+  // Windows, Linux: bezárjuk az appot, ha nincs ablak
   if (process.platform !== 'darwin') app.quit();
 });
 
-
 app.on('activate', () => {
+  // macOS: ha nincs ablak, de az app fut, új ablakot hozunk létre
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
 
+/* IPC-kezelők: */
 
-
-
+// Ablakvezérlés
 ipcMain.handle('windowControl', (event, action) => {
-  const mainWindow = BrowserWindow.fromWebContents(event.sender);
+  const bw = BrowserWindow.fromWebContents(event.sender);
   switch (action) {
     case 'minimize':
-      mainWindow.minimize();
+      bw.minimize();
       break;
     case 'maximize':
-      if (mainWindow.isMaximized()) mainWindow.unmaximize();
-      else mainWindow.maximize();
+      if (bw.isMaximized()) bw.unmaximize();
+      else bw.maximize();
       break;
     case 'close':
-      mainWindow.close();
+      bw.close();
       break;
   }
 });
 
-
+// Bővítmény mappa kiválasztása
 ipcMain.handle('pickExtensionDirectory', async (event) => {
-  const mainWindow = BrowserWindow.fromWebContents(event.sender);
-  const result = await dialog.showOpenDialog(mainWindow, {
+  const bw = BrowserWindow.fromWebContents(event.sender);
+  const result = await dialog.showOpenDialog(bw, {
     properties: ['openDirectory']
   });
-  if (result.canceled || !result.filePaths[0]) {
-    return null;
-  }
+  if (result.canceled || !result.filePaths[0]) return null;
   return result.filePaths[0];
 });
 
-
-ipcMain.handle('installExtension', async (event, extensionPath) => {
+// Bővítmény telepítése
+ipcMain.handle('installExtension', async (event, dirPath) => {
   try {
-    const loaded = await session.defaultSession.loadExtension(extensionPath);
+    const loaded = await session.defaultSession.loadExtension(dirPath);
     return { success: true, name: loaded.name };
-  } catch (error) {
-    return { success: false, error: error.message };
+  } catch (err) {
+    return { success: false, error: err.message };
   }
 });
 
-
+// Bővítmény keresése
 ipcMain.handle('searchExtensions', (event, query) => {
-
-  const results = extensionStore.filter(ext => {
-    return (
-      ext.name.toLowerCase().includes(query.toLowerCase()) ||
-      ext.description.toLowerCase().includes(query.toLowerCase())
-    );
+  const q = query.toLowerCase();
+  const results = extensionStore.filter(item => {
+    return item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
   });
   return results;
 });
