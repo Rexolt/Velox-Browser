@@ -1,10 +1,8 @@
-// renderer.js
 const { ipcRenderer } = require('electron');
 
-let tabs = [];  // {id, title, url, webviewEl, iconUrl, isActive}
+let tabs = []; // {id, title, url, webviewEl, iconUrl, isActive}
 let currentTabId = null;
-
-let historyArray = [];  // { url, title, time }
+let historyArray = []; // { url, title, time }
 
 const tabListEl = document.getElementById('tabList');
 const webviewContainerEl = document.getElementById('webviewContainer');
@@ -18,25 +16,29 @@ const historyOverlay = document.getElementById('historyOverlay');
 const historyListEl = document.getElementById('historyList');
 const favoritesOverlay = document.getElementById('favoritesOverlay');
 const favoritesListEl = document.getElementById('favoritesList');
-
 const settingsOverlay = document.getElementById('settingsOverlay');
 const hardwareAccelToggle = document.getElementById('hardwareAccelToggle');
 const sandboxToggle = document.getElementById('sandboxToggle');
 
-// --- ABLAK KEZELÉS ---
 function windowControl(action) {
   ipcRenderer.invoke('windowControl', action);
 }
 
-// --- TABBING FUNKCIÓK ---
-function openNewTab(url = 'https://www.google.com') {
+function openNewTab(url = 'https://www.google.com/ncr') {
   const tabId = Date.now().toString();
   const webview = document.createElement('webview');
-  // Webview partition, pl. 'persist:velox' - tartós tároláshoz
+
+  // Webview beállítások
   webview.setAttribute('partition', 'persist:velox');
-  webview.src = url;
   webview.setAttribute('allowpopups', 'true');
   webview.style.display = 'none';
+  // Beállítjuk a user agentet asztali böngészőhöz hasonlóan
+  webview.setUserAgent(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+    'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+    'Chrome/114.0.0.0 Safari/537.36'
+  );
+  webview.src = url;
   webviewContainerEl.appendChild(webview);
 
   const newTab = {
@@ -49,19 +51,20 @@ function openNewTab(url = 'https://www.google.com') {
   };
   tabs.push(newTab);
 
-  // Események
-  webview.addEventListener('page-title-updated', () => {
-    newTab.title = webview.getTitle();
+  webview.addEventListener('page-title-updated', (e) => {
+    newTab.title = e.title || 'Új fül';
+    updateTabListUI();
   });
+
   webview.addEventListener('did-stop-loading', () => {
     newTab.url = webview.getURL();
     urlBar.value = newTab.url;
-
-    // favicon kinyerése
-    const domain = (new URL(newTab.url)).hostname;
-    newTab.iconUrl = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64';
-
-    // Előzménybe mentés
+    try {
+      const domain = new URL(newTab.url).hostname;
+      newTab.iconUrl = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64';
+    } catch (err) {
+      newTab.iconUrl = 'https://www.google.com/s2/favicons?domain=google.com&sz=64';
+    }
     historyArray.push({
       url: newTab.url,
       title: newTab.title,
@@ -97,7 +100,6 @@ function closeTab(tabId) {
     const closingTab = tabs[idx];
     webviewContainerEl.removeChild(closingTab.webviewEl);
     tabs.splice(idx, 1);
-
     if (closingTab.id === currentTabId) {
       if (tabs.length > 0) {
         setActiveTab(tabs[tabs.length - 1].id);
@@ -142,7 +144,6 @@ function updateTabListUI() {
   });
 }
 
-// --- NAVIGÁCIÓ ---
 backBtn.addEventListener('click', () => {
   const tab = getCurrentTab();
   if (tab && tab.webviewEl.canGoBack()) {
@@ -168,11 +169,9 @@ urlBar.addEventListener('keydown', (e) => {
 });
 
 function decideUrl(input) {
-  // Ha http/https protokollal kezdődik, megy simán
   if (/^https?:\/\//i.test(input)) {
     return input;
   }
-  // Egyébként Google keresés
   return 'https://www.google.com/search?q=' + encodeURIComponent(input);
 }
 
@@ -185,11 +184,10 @@ function getCurrentTab() {
   return tabs.find(t => t.isActive);
 }
 
-// --- KEDVENCEK ---
 favBtn.addEventListener('click', async () => {
   const tab = getCurrentTab();
   if (tab) {
-    const res = await ipcRenderer.invoke('addFavorite', {
+    await ipcRenderer.invoke('addFavorite', {
       title: tab.title,
       url: tab.url
     });
@@ -217,12 +215,10 @@ async function showFavorites() {
   }
   favoritesOverlay.style.display = 'flex';
 }
-
 function closeFavorites() {
   favoritesOverlay.style.display = 'none';
 }
 
-// --- ELŐZMÉNYEK ---
 function showHistory() {
   historyListEl.innerHTML = '';
   if (historyArray.length === 0) {
@@ -244,51 +240,60 @@ function showHistory() {
   }
   historyOverlay.style.display = 'flex';
 }
-
 function closeHistory() {
   historyOverlay.style.display = 'none';
 }
 
-// --- BŐVÍTMÉNYEK TELEPÍTÉSE ---
 async function pickExtensionInstall() {
   const dirPath = await ipcRenderer.invoke('pickExtensionDirectory');
   if (!dirPath) {
-    alert("Nincs mappa kiválasztva vagy megszakítva.");
+    alert('Nincs mappa kiválasztva vagy megszakítva.');
     return;
   }
   const result = await ipcRenderer.invoke('installExtension', dirPath);
   if (result.success) {
-    alert("Bővítmény telepítve: " + result.name);
+    alert('Bővítmény telepítve: ' + result.name);
   } else {
-    alert("Hiba: " + result.error);
+    alert('Hiba: ' + result.error);
   }
 }
 
-// --- BEÁLLÍTÁSOK (Settings) ---
 function showSettings() {
-  // Esetleg betöltjük a kezdeti állapotot is (demó)
-  hardwareAccelToggle.checked = false; // Itt esetleg ipcrenderer-től infót kérhetnénk
+  hardwareAccelToggle.checked = false;
   sandboxToggle.checked = false;
   settingsOverlay.style.display = 'flex';
 }
 function closeSettings() {
   settingsOverlay.style.display = 'none';
 }
-
-mainWindow.webContents.setUserAgent(
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' + 
-  '(KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
-);
 async function saveSettings() {
   const hwAccel = hardwareAccelToggle.checked;
   const sandbox = sandboxToggle.checked;
-  // Példa: valós appnál ez a main process felé menne, és ott hívnánk app.commandLine.appendSwitch(...) 
-  // DE a switch-eket jellemzően az app indulásakor állítjuk be, run-time váltogatni nem mindig lehet.
   alert(`Beállítások mentve: \nHardveres gyorsítás: ${hwAccel}\nSandbox: ${sandbox}`);
   closeSettings();
 }
-
-// Oldal betöltéskor automatikusan nyitunk egy új fület
+//-------------------------------------------------------------------------
 window.addEventListener('DOMContentLoaded', () => {
+  
   openNewTab();
+
+  const currentTab = tabs.find(t => t.isActive);
+  if (currentTab) {
+    urlBar.value = currentTab.url;
+  }
+  updateTabListUI();
+
 });
+
+//-------------------------------------------------------------------------
+
+window.openNewTab = openNewTab;
+window.showFavorites = showFavorites;
+window.showHistory = showHistory;
+window.pickExtensionInstall = pickExtensionInstall;
+window.showSettings = showSettings;
+window.closeHistory = closeHistory;
+window.closeFavorites = closeFavorites;
+window.closeSettings = closeSettings;
+window.saveSettings = saveSettings;
+window.windowControl = windowControl;

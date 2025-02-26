@@ -2,128 +2,137 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Velox Browser</title>
-  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link 
-    href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" 
-    rel="stylesheet"
-  />
-  <link 
-    href="https://fonts.googleapis.com/css2?family=Material+Icons"
-    rel="stylesheet"
-  />
- 
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .drag-region {
+      -webkit-app-region: drag;
+      flex: 1;
+    }
+    .win-btn, button {
+      -webkit-app-region: no-drag;
+    }
+  </style>
 </head>
-
 <body>
-<div class="app-container">
- 
-  <div class="titlebar">
-    <div class="window-controls">
-      <div class="win-btn red"    data-symbol="×" onclick="windowControl('close')"></div>
-      <div class="win-btn yellow" data-symbol="–" onclick="windowControl('minimize')"></div>
-      <div class="win-btn green"  data-symbol="+" onclick="windowControl('maximize')"></div>
+  <div class="app-container">
+    <header class="titlebar">
+      <div class="window-controls">
+        <button type="button" class="win-btn red" data-action="close" aria-label="Ablak bezárása" data-symbol="×"></button>
+        <button type="button" class="win-btn yellow" data-action="minimize" aria-label="Ablak minimalizálása" data-symbol="–"></button>
+        <button type="button" class="win-btn green" data-action="maximize" aria-label="Ablak maximalizálása" data-symbol="+"></button>
+      </div>
+      <div class="drag-region"></div>
+    </header>
+    <div class="body-layout">
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <button type="button" class="sidebar-item" id="newTabBtn">
+            <i class="material-icons">add</i>
+            <span class="sidebar-text">Új fül</span>
+          </button>
+        </div>
+        <div class="tab-list" id="tabList"></div>
+        <div class="sidebar-bottom">
+          <button type="button" class="sidebar-item" id="favoritesBtn">
+            <i class="material-icons">star</i>
+            <span class="sidebar-text">Kedvencek</span>
+          </button>
+          <button type="button" class="sidebar-item" id="historyBtn">
+            <i class="material-icons">history</i>
+            <span class="sidebar-text">Előzmények</span>
+          </button>
+          <button type="button" class="sidebar-item" id="extensionsBtn">
+            <i class="material-icons">extension</i>
+            <span class="sidebar-text">Bővítmények</span>
+          </button>
+          <button type="button" class="sidebar-item" id="settingsBtn">
+            <i class="material-icons">settings</i>
+            <span class="sidebar-text">Beállítások</span>
+          </button>
+        </div>
+      </aside>
+      <main class="content-panel">
+        <nav class="nav-bar">
+          <div class="nav-buttons">
+            <button id="backBtn" aria-label="Vissza">
+              <span class="material-icons">arrow_back</span>
+            </button>
+            <button id="forwardBtn" aria-label="Előre">
+              <span class="material-icons">arrow_forward</span>
+            </button>
+            <button id="reloadBtn" aria-label="Frissítés">
+              <span class="material-icons">autorenew</span>
+            </button>
+          </div>
+          <input type="text" class="url-bar" id="urlBar" placeholder="Írj be URL-t vagy keresőszót..." aria-label="URL vagy kereső" />
+          <button id="favBtn" class="fav-button" aria-label="Kedvencek">
+            <span class="material-icons">star_outline</span>
+          </button>
+        </nav>
+        <section class="webview-container" id="webviewContainer">
+        </section>
+      </main>
     </div>
-    <div class="drag-region"></div>
-  </div>
-
-  
-  <div class="body-layout">
-    
-    <div class="sidebar">
-      <div class="sidebar-top">
-        <div class="sidebar-item" onclick="openNewTab()">
-          <i class="material-icons">add</i>
-          <span class="sidebar-text">Új fül</span>
-        </div>
-      </div>
-      <div class="tab-list" id="tabList"></div>
-      <div class="sidebar-bottom">
-        <div class="sidebar-item" onclick="showFavorites()">
-          <i class="material-icons">star</i>
-          <span class="sidebar-text">Kedvencek</span>
-        </div>
-        <div class="sidebar-item" onclick="showHistory()">
-          <i class="material-icons">history</i>
-          <span class="sidebar-text">Előzmények</span>
-        </div>
-        <div class="sidebar-item" onclick="pickExtensionInstall()">
-          <i class="material-icons">extension</i>
-          <span class="sidebar-text">Bővítmények</span>
-        </div>
-        <div class="sidebar-item" onclick="showSettings()">
-          <i class="material-icons">settings</i>
-          <span class="sidebar-text">Beállítások</span>
-        </div>
+    <div class="overlay" id="historyOverlay" aria-hidden="true">
+      <div class="overlay-content" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+        <h2 id="historyTitle">Előzmények</h2>
+        <div id="historyList"></div>
+        <button type="button" id="closeHistoryBtn">Bezár</button>
       </div>
     </div>
-
- 
-    <div class="content-panel">
-      <div class="nav-bar">
-        <div class="nav-buttons">
-          <button id="backBtn"><span class="material-icons">arrow_back</span></button>
-          <button id="forwardBtn"><span class="material-icons">arrow_forward</span></button>
-          <button id="reloadBtn"><span class="material-icons">autorenew</span></button>
+    <div class="overlay" id="favoritesOverlay" aria-hidden="true">
+      <div class="overlay-content" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle">
+        <h2 id="favoritesTitle">Kedvencek</h2>
+        <div id="favoritesList"></div>
+        <button type="button" id="closeFavoritesBtn">Bezár</button>
+      </div>
+    </div>
+    <div class="overlay" id="settingsOverlay" aria-hidden="true">
+      <div class="overlay-content" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <h2 id="settingsTitle">Beállítások</h2>
+        <div>
+          <label>
+            <input type="checkbox" id="hardwareAccelToggle" />
+            Hardveres gyorsítás engedélyezése
+          </label>
         </div>
-        <input type="text" class="url-bar" id="urlBar" placeholder="Írj be URL-t vagy keresőszót..." />
-        <button id="favBtn" class="fav-button">
-          <span class="material-icons">star_outline</span>
-        </button>
+        <div style="margin-top: 8px;">
+          <label>
+            <input type="checkbox" id="sandboxToggle" />
+            Sandbox engedélyezése
+          </label>
+        </div>
+        <div style="margin-top: 12px;">
+          <button type="button" id="saveSettingsBtn">Mentés</button>
+          <button type="button" id="cancelSettingsBtn" style="margin-left: 8px;">Mégse</button>
+        </div>
       </div>
-      <div class="webview-container" id="webviewContainer">
-     
-      </div>
-    </div>
-  </div>
-
-  
-  <div class="overlay" id="historyOverlay">
-    <div class="overlay-content" id="historyContent">
-      <h2>Előzmények</h2>
-      <div id="historyList"></div>
-      <button onclick="closeHistory()">Bezár</button>
-    </div>
-  </div>
-
-
-  <div class="overlay" id="favoritesOverlay">
-    <div class="overlay-content">
-      <h2>Kedvencek</h2>
-      <div id="favoritesList"></div>
-      <button onclick="closeFavorites()">Bezár</button>
-    </div>
-  </div>
-
-
-
-  <div class="overlay" id="settingsOverlay">
-    <div class="overlay-content">
-      <h2>Beállítások</h2>
-      <p> 
-        
-      </p>
-      <div>
-        <label>
-          <input type="checkbox" id="hardwareAccelToggle" />
-          Hardveres gyorsítás engedélyezése
-        </label>
-      </div>
-      <div style="margin-top: 8px;">
-        <label>
-          <input type="checkbox" id="sandboxToggle" />
-          Sandbox engedélyezése
-        </label>
-      </div>
-      <button style="margin-top: 12px;" onclick="saveSettings()">Mentés</button>
-      <button style="margin-left: 8px;" onclick="closeSettings()">Mégse</button>
     </div>
   </div>
-</div>
-
-
-<script src="render.js"></script>
+  <script src="render.js"></script>
+  <script>
+    document.querySelectorAll('.win-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-action');
+        if (typeof windowControl === 'function') {
+          windowControl(action);
+        }
+      });
+    });
+    document.getElementById('newTabBtn').addEventListener('click', openNewTab);
+    document.getElementById('favoritesBtn').addEventListener('click', showFavorites);
+    document.getElementById('historyBtn').addEventListener('click', showHistory);
+    document.getElementById('extensionsBtn').addEventListener('click', pickExtensionInstall);
+    document.getElementById('settingsBtn').addEventListener('click', showSettings);
+    document.getElementById('closeHistoryBtn').addEventListener('click', closeHistory);
+    document.getElementById('closeFavoritesBtn').addEventListener('click', closeFavorites);
+    document.getElementById('cancelSettingsBtn').addEventListener('click', closeSettings);
+    document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+  </script>
 </body>
 </html>
